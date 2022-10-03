@@ -15,5 +15,5 @@ plex = PlexServer()
 tv = plex.library.section('TV Shows')
 for shows in tv.search(label='AutoWatch'):
     for episode in shows.unwatched():
-        episode.markWatched()
+        episode.markPlayed()
 
