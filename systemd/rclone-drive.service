@@ -49,7 +49,7 @@ ExecStart=/usr/bin/rclone mount gcrypt: /GD \
 # This sets a per file bandwidth control and I limit this to a little bigger than my largest bitrate I'd want to play
 --bwlimit-file 32M
 ExecStop=/bin/fusermount -uz /GD
-ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --rc-addr 127.0.0.1:5572 _async=true
+ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --url 127.0.0.1:5572 _async=true
 Restart=on-failure
 User=felix
 Group=felix

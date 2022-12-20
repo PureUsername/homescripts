@@ -43,7 +43,7 @@ ExecStart=/usr/bin/rclone mount dcrypt-tv: /media/TV \
 # Disable HTTP2
 --disable-http2
 ExecStop=/bin/fusermount -uz /media/TV
-ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --rc-addr 127.0.0.1:5575 _async=true
+ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --url 127.0.0.1:5575 _async=true
 Restart=on-failure
 User=felix
 Group=felix
