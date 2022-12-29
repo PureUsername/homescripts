@@ -14,6 +14,8 @@ for torrent in torrent_list:
             print(torrent.name,' ',status.msg)
             torrent.delete(hash=(torrent.hash),delete_files=True)
 
+torrent_list = client.torrents.info()
+
 for torrent in torrent_list:
     for status in torrent.trackers:
         if 'unregistered torrent' in status.msg:
