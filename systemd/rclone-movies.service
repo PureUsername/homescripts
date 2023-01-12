@@ -13,7 +13,7 @@ ExecStart=/usr/bin/rclone mount dcrypt-movies: /media/Movies \
 # Dropbox is a polling remote so this value can be set very high and any changes are detected via polling.
 --dir-cache-time 9999h \
 # Log file location
---log-file /opt/rclone/logs/dropbox-movies.log \
+--log-file /opt/rclone/logs/rclone-movies.log \
 # Set the log level
 --log-level INFO \
 # This is setting the file permission on the mount to user and group have the same access and other can read
@@ -25,23 +25,25 @@ ExecStart=/usr/bin/rclone mount dcrypt-movies: /media/Movies \
 # no-auth is used as no one else uses my server and it is not a shared seedbox
 --rc-no-auth \
 # The local disk used for caching
---cache-dir=/cache2/Movies \
+--cache-dir=/cache/Movies \
 # This is used for caching files to local disk for streaming
 --vfs-cache-mode full \
 # This limits the cache size to the value below
---vfs-cache-max-size 800G \
+--vfs-cache-max-size 600G \
+# Speed up the reading: Use fast (less accurate) fingerprints for change detection
+--vfs-fast-fingerprint \
+# Set chunk size
+--vfs-read-chunk-size 32M \
 # Wait before uploading
 --vfs-write-back 1h \
 # This limits the age in the cache if the size is reached and it removes the oldest files first
 --vfs-cache-max-age 9999h \
+# Disable HTTP2
+--disable-http2 \
 # Set the tpslimit
 --tpslimit 12 \
 # Set the tpslimit-burst
---tpslimit-burst 12 \
-# Fix IPV6 Errors if you are not running IPV6
---bind 192.168.1.30 \
-# Disable HTTP2
---disable-http2
+--tpslimit-burst 0
 ExecStop=/bin/fusermount -uz /media/Movies
 ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --url 127.0.0.1:5574 _async=true
 Restart=on-failure
