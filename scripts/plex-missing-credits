@@ -1,0 +1,7 @@
+#!/bin/bash
+
+db="/opt/docker/data/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases/com.plexapp.plugins.library.db"
+sqlite3 "$db" <<'END_SQL'
+.timeout 30
+SELECT file FROM media_parts mp JOIN media_items mi ON mi.id = mp.media_item_id WHERE mi.library_section_id IN ( SELECT id FROM library_sections WHERE section_type = 2 ) AND mp.extra_data NOT LIKE '%credit=%' AND ( SELECT 1 FROM taggings WHERE taggings.metadata_item_id = mi.metadata_item_id AND taggings.text = 'credit' LIMIT 1 ) IS NULL;
+END_SQL

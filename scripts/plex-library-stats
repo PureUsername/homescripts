@@ -46,4 +46,9 @@ query="SELECT COUNT(0) FROM media_parts mp JOIN media_items mi ON mi.id = mp.med
 result=$(sqlite3 -header -line "$db" "$query")
 echo "${result:11} not analyzed for intros"
 
+echo " "
+query="SELECT COUNT(0) FROM media_parts mp JOIN media_items mi ON mi.id = mp.media_item_id AND mp.extra_data NOT LIKE '%credit=%' AND ( SELECT 1 FROM taggings WHERE taggings.metadata_item_id = mi.metadata_item_id AND taggings.text = 'credit' LIMIT 1 ) IS NULL;"
+result=$(sqlite3 -header -line "$db" "$query")
+echo "${result:11} not analyzed for credits"
+
 exit

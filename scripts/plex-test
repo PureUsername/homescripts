@@ -1,0 +1,17 @@
+#!/usr/bin/python3
+
+# This is just a small utility I use to mark shows watched that I don't actually care about
+# I edit the TV shows and make their Sharing tag "AutoWatch" and this script runs in cron
+# to mark them watched so they don't clutter up my plex screen
+
+import os
+import subprocess
+import sys
+os.environ['PLEXAPI_CONFIG_PATH'] = "/home/felix/scripts/plexapi.ini"
+
+from plexapi.server import PlexServer
+plex = PlexServer()
+
+shows = plex.library.section('TV Shows')
+ep = shows.get(show).episode(season=int(Ssn), episode=int(Epnum))  
+print (ep.hasIntroMarker)
