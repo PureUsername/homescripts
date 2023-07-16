@@ -10,24 +10,35 @@ I use the latest rclone stable version downloaded direclty via the [script insta
 
 - Verizon Gigabit Fios
 - Dropbox with encrypted media folder
-- Linux
-- Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz
+- Linux (Fedora Server)
+- I use a System 76 machine for my Plex server which is a small and works well for me: [System 76 Meerkat](https://system76.com/desktops/meerkat)
+- 12th Gen Intel(R) Core(TM) i7-1260P
 - 32 GB of Memory
 - 1TB - root/system disk
 - 2TB SSD for rclone disk cache
-- Spinning disk for big storage pools
+- External USB enclose with spinning disk for any local storage needs
 
-I adjusted my mounts on my Linux machine to use BTRFS over EXT4/XFS and found a huge performance improvement.
+I am currently using XFS as that offers generally the same performance for me as BTRFS. Ext4 works well, but I noticed I got better directory listing speeds for Plex with both XFS and BTRFS over EXT4. It speeds up my backups mainly which is why I use this over EXT4. A directory listing prior would take 30-45 seconds for the Plex area and takes 3-4 seconds with XFS/BTRFS over EXT4 for me.
 
 /etc/fstab
 
 ```bash
-/dev/disk/by-uuid/f12cd4cf-d9e5-4022-8d16-5ccde5c4273e / btrfs defaults 0 1
-/dev/disk/by-uuid/7B20-481C /boot/efi vfat defaults 0 1
+UUID=9007601b-870b-4c7e-81b6-a7e32b29fadb /                       xfs     defaults        0 0
+UUID=6ebae641-b668-46e7-a03c-9cee1686763e /boot                   xfs     defaults        0 0
+UUID=B342-A864          /boot/efi               vfat    umask=0077,shortname=winnt 0 2
 
-# SSD
-UUID=7f93b2af-ad87-4db1-aa82-682136cec07a /cache auto defaults 0 0
-UUID=e065dcaa-e548-45e6-a226-f5ea83b5ab22 /data auto defaults 0 0
+# Cache
+/dev/disk/by-uuid/d293dc20-a20c-4f50-83eb-5022bdad6334 /cache xfs defaults 0 1
+
+# Disk for Backups
+/dev/disk/by-uuid/c38f3085-7e8b-4494-b909-1cc3b4727e5e /data xfs defaults 0 2
+
+# 20TB Staging Area
+/dev/disk/by-uuid/8bc677ea-467f-4714-8873-495b89922089 /stage xfs defaults 0 2
+
+# Disks for Storage Seeding
+/dev/disk/by-uuid/f6d99daa-f45a-4abf-b31b-af46baeaf6d8 /seed xfs defaults 0 2
+/dev/disk/by-uuid/0c31fa6b-fc85-415a-a04c-2ba4f036b5cb /seed2 xfs defaults 0 2
 ```
 
 ## Dropbox
@@ -44,8 +55,8 @@ The design goals for the workflow are to limit the amount of applications that b
 
 Worfklow Pattern:
 1. Sonarr/Radarr identify a file to be downloaded
-2. qBit/NZBget downloads a file to local spinning disk (/data)
-3. Sonarr/Radarr see the download is complete, file is copied from spinning disk (/data) to the respective rclone mount (/media/Movies or media/TV)
+2. qBit/NZBget downloads a file to local spinning disk (/stage)
+3. Sonarr/Radarr see the download is complete, file is copied from spinning disk (/stage) to the respective rclone mount (/media/Movies or media/TV)
 4. Rclone waits the delay time (1 hour in this setup) and uploads the file to the remote
 
 This workflow has a lot less moving parts and reduces the amount of things that can break. There is a local cache drive for rclone (/cache) that is used for the vfs-cache-mode full that stores the uploads before they get uploaded and any downloaded cache files. The only breakpoint here is if the cache area gets full, but generally that should not happen as files are uploaded within an hour and it is a 2TB SSD in this setup that should offer plenty of space. If that disk is too small, there can be issue with it filling up and creating an issue. Disk is cheap enough though that should not be a problem.
@@ -56,12 +67,28 @@ This workflow has a lot less moving parts and reduces the amount of things that 
 My Linux setup:
 
 ```bash
-lsb_release -a
-No LSB modules are available.
-Distributor ID:	Ubuntu
-Description:	Ubuntu 22.04 LTS
-Release:	22.04
-Codename:	jammy
+cat /etc/os-release
+NAME="Fedora Linux"
+VERSION="38 (Server Edition)"
+ID=fedora
+VERSION_ID=38
+VERSION_CODENAME=""
+PLATFORM_ID="platform:f38"
+PRETTY_NAME="Fedora Linux 38 (Server Edition)"
+ANSI_COLOR="0;38;2;60;110;180"
+LOGO=fedora-logo-icon
+CPE_NAME="cpe:/o:fedoraproject:fedora:38"
+HOME_URL="https://fedoraproject.org/"
+DOCUMENTATION_URL="https://docs.fedoraproject.org/en-US/fedora/f38/system-administrators-guide/"
+SUPPORT_URL="https://ask.fedoraproject.org/"
+BUG_REPORT_URL="https://bugzilla.redhat.com/"
+REDHAT_BUGZILLA_PRODUCT="Fedora"
+REDHAT_BUGZILLA_PRODUCT_VERSION=38
+REDHAT_SUPPORT_PRODUCT="Fedora"
+REDHAT_SUPPORT_PRODUCT_VERSION=38
+SUPPORT_END=2024-05-14
+VARIANT="Server Edition"
+VARIANT_ID=server
 ```
 
 Fuse needs to be installed for a rclone mount to function. `allow-other` is for my use and not recommended for shared servers as it allows any user to see a rclone mount. I am on a dedicated server that only I use so that is why I uncomment it.
