@@ -93,7 +93,7 @@ My `rclone.conf` has an entry multiple entries for Dropbox as unlike Google that
 
 My rclone looks like: [rclone.conf](https://github.com/animosity22/homescripts/blob/master/rclone.conf)
 
-They are all mounted via systemd scripts. rclone is mounted first followed by the mergerfs mount.
+They are all mounted via systemd scripts.
 
 My media starts up items in order:
 
