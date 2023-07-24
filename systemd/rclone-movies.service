@@ -36,8 +36,9 @@ ExecStart=/usr/bin/rclone mount dcrypt-movies: /media/Movies \
 --vfs-write-back 1h \
 # This limits the age in the cache if the size is reached and it removes the oldest files first
 --vfs-cache-max-age 9999h \
-# Disable HTTP2
-#--disable-http2 \
+# For Dropbox, set a default time on any directory so it does not change. Dropbox does not present this to the API which causes Plex
+# to refresh metadata after a remount as the directory time will change to the time rclone was started by default
+--default-time 2023-01-01 \
 # Set the tpslimit
 --tpslimit 12 \
 # Set the tpslimit-burst
