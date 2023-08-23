@@ -7,7 +7,7 @@ After=network-online.target
 Type=notify
 Environment=RCLONE_CONFIG=/opt/rclone/rclone.conf
 RestartSec=5
-ExecStart=/usr/bin/rclone mount dcrypt-movies: /media/Movies \
+ExecStart=/usr/bin/rclone mount2 dcrypt-movies: /media/Movies \
 # This is for allowing users other than the user running rclone access to the mount
 --allow-other \
 # Dropbox is a polling remote so this value can be set very high and any changes are detected via polling.
@@ -36,13 +36,8 @@ ExecStart=/usr/bin/rclone mount dcrypt-movies: /media/Movies \
 --vfs-write-back 1h \
 # This limits the age in the cache if the size is reached and it removes the oldest files first
 --vfs-cache-max-age 9999h \
-# For Dropbox, set a default time on any directory so it does not change. Dropbox does not present this to the API which causes Plex
-# to refresh metadata after a remount as the directory time will change to the time rclone was started by default
---default-time 2023-01-01 \
-# Set the tpslimit
---tpslimit 12 \
-# Set the tpslimit-burst
---tpslimit-burst 0
+# Set the sleep time
+--dropbox-pacer-min-sleep 75ms
 ExecStop=/bin/fusermount3 -uz /media/Movies
 ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --url 127.0.0.1:5574 _async=true
 Restart=on-failure
