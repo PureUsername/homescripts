@@ -26,7 +26,7 @@ ExecStart=/usr/bin/rclone mount gcrypt: /GD \
 # This sets up the remote control daemon so you can issue rc commands locally
 --rc \
 # This is the default port it runs on
---rc-addr :5572 \
+--rc-addr 127.0.0.1:5572 \
 # no-auth is used as no one else uses my server and it is not a shared seedbox
 --rc-no-auth \
 # The local disk used for caching
