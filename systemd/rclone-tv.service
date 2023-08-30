@@ -37,7 +37,7 @@ ExecStart=/usr/bin/rclone mount2 dcrypt-tv: /media/TV \
 # This limits the age in the cache if the size is reached and it removes the oldest files first
 --vfs-cache-max-age 9999h \
 # Set the sleep time
---dropbox-pacer-min-sleep 75ms
+--dropbox-pacer-min-sleep 100ms
 ExecStop=/bin/fusermount3 -uz /media/TV
 ExecStartPost=/usr/bin/rclone rc vfs/refresh recursive=true --url 127.0.0.1:5575 _async=true
 Restart=on-failure
